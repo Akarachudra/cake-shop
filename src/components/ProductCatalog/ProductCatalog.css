@@ -1,0 +1,14 @@
+.product-catalog {
+  padding: 1rem;
+}
+
+.product-catalog h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
