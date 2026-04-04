@@ -8,7 +8,7 @@ export default function App() {
   const [cartItems, setCartItems] = useState([])
 
   useEffect(() => {
-    analytics.init('G-4C0NWC3REY', '987654321987654')
+    analytics.init('G-4C0NWC3REY', '4038437582960474')
   }, [])
 
   return (
