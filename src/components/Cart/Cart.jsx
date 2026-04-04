@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { analytics } from '../../services/analytics'
+import OrderSuccess from '../OrderSuccess/OrderSuccess'
 import './Cart.css'
 
 export default function Cart({ items }) {
   const [showCheckout, setShowCheckout] = useState(false)
+  const [transactionId, setTransactionId] = useState(null)
 
   const total = items.reduce((sum, item) => sum + item.price, 0)
 
@@ -15,15 +17,26 @@ export default function Cart({ items }) {
   }
 
   const handlePurchase = () => {
-    const transactionId = `TXN-${Date.now()}`
-    analytics.trackPurchase(items, transactionId)
+    const txnId = `TXN-${Date.now()}`
+    analytics.trackPurchase(items, txnId)
+    setTransactionId(txnId)
     setShowCheckout(false)
-    // In a real app, this would clear the cart
   }
 
   const handleRemoveItem = (indexToRemove) => {
     const item = items[indexToRemove]
     analytics.trackRemoveFromCart(item)
+  }
+
+  if (transactionId) {
+    return (
+      <section className="cart">
+        <OrderSuccess
+          transactionId={transactionId}
+          onContinueShopping={() => setTransactionId(null)}
+        />
+      </section>
+    )
   }
 
   return (
