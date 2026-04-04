@@ -8,8 +8,7 @@ export default function App() {
   const [cartItems, setCartItems] = useState([])
 
   useEffect(() => {
-    // Initialize analytics with fake IDs for testing (runs once on mount)
-    analytics.init('G-FAKEID123456', '987654321987654')
+    analytics.init('G-4C0NWC3REY', '987654321987654')
   }, [])
 
   return (
