@@ -3,7 +3,7 @@ import ProductCard from '../ProductCard/ProductCard'
 import { analytics } from '../../services/analytics'
 import './ProductCatalog.css'
 
-const PRODUCTS = [
+export const PRODUCTS = [
   { id: 1, name: 'Chocolate Cake', price: 25, category: 'Cakes', image: '🍫' },
   { id: 2, name: 'Vanilla Cake', price: 20, category: 'Cakes', image: '🍦' },
   { id: 3, name: 'Strawberry Cake', price: 28, category: 'Cakes', image: '🍓' },
