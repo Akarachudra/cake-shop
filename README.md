@@ -14,13 +14,16 @@ This is a simple e-commerce demo site built with React + Vite. It's designed to 
 - Product catalog with view_item events
 - Shopping cart with add_to_cart/remove_from_cart events
 - Checkout flow with begin_checkout and purchase events
-- Centralized analytics service for easy GA4/Meta Pixel integration
-- Automatic GitHub Pages deployment
+- Order success page showing transaction ID after purchase
+- Dual analytics tracking: GA4 + Meta Pixel events
+- Centralized analytics service with automatic event mapping
+- Automatic GitHub Pages deployment with GitHub Actions
+- Node.js 24 support
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 20.x or later
+- Node.js 24.x or later
 - npm
 
 ### Installation
@@ -53,37 +56,52 @@ npm run preview
 
 ## Analytics Integration
 
-The analytics service is located in `src/services/analytics.js`. To integrate GA4 and Meta Pixel:
+The analytics service is located in `src/services/analytics.js`. It provides dual tracking for both GA4 and Meta Pixel with automatic event mapping.
+
+### Initialization
 
 1. Update `src/App.jsx` to initialize analytics with your IDs:
 ```javascript
 import { analytics } from './services/analytics'
+import { useEffect } from 'react'
 
-// Initialize on app load
-analytics.init('GA4_MEASUREMENT_ID', 'META_PIXEL_ID')
+useEffect(() => {
+  analytics.init('GA4_MEASUREMENT_ID', 'META_PIXEL_ID')
+}, [])
 ```
 
-2. The service automatically tracks:
-   - `view_item` - When a product is viewed
-   - `add_to_cart` - When a product is added to cart
-   - `remove_from_cart` - When a product is removed from cart
-   - `begin_checkout` - When checkout starts
-   - `purchase` - When purchase is completed
+### Event Tracking
+
+The service automatically tracks e-commerce events and maps them to both GA4 and Meta Pixel:
+
+**GA4 Events:**
+- `view_item` - When a product is viewed
+- `add_to_cart` - When a product is added to cart
+- `remove_from_cart` - When a product is removed from cart
+- `begin_checkout` - When checkout starts
+- `purchase` - When purchase is completed
+
+**Meta Pixel Event Mapping:**
+- GA4 `view_item` → Meta `ViewContent`
+- GA4 `add_to_cart` → Meta `AddToCart`
+- GA4 `begin_checkout` → Meta `InitiateCheckout`
+- GA4 `purchase` → Meta `Purchase`
 
 ## Deployment
 
 ### GitHub Pages
 
-This project automatically deploys to GitHub Pages on every push to the `master` branch.
+This project automatically deploys to GitHub Pages on every push to the `master` branch using GitHub Actions.
 
 The deployment is configured via `.github/workflows/deploy.yml` and uses:
-- Node.js to build the project
-- `peaceiris/actions-gh-pages` to deploy to GitHub Pages
+- Node.js 24.x to build the project
+- Official GitHub Actions for deployment (`actions/checkout`, `actions/setup-node`, `actions/configure-pages`, `actions/upload-pages-artifact`, `actions/deploy-pages`)
 
 **Setup:**
 1. Ensure your repository has GitHub Pages enabled
-2. Set the source to "Deploy from branch" with `gh-pages` branch
-3. On push to master, the workflow will automatically build and deploy
+2. Go to Settings → Pages
+3. Set the source to **"GitHub Actions"** (NOT "Deploy from a branch")
+4. On push to master, the workflow will automatically build and deploy
 
 **Visit your site at:** `https://your-username.github.io/cake-shop/`
 
@@ -94,9 +112,10 @@ src/
 ├── components/
 │   ├── ProductCatalog/     # Product listing
 │   ├── ProductCard/        # Individual product card
-│   └── Cart/               # Shopping cart
+│   ├── Cart/               # Shopping cart and checkout
+│   └── OrderSuccess/       # Purchase confirmation page
 ├── services/
-│   └── analytics.js        # GA4 & Meta Pixel tracking
+│   └── analytics.js        # GA4 & Meta Pixel tracking service
 ├── App.jsx                 # Main app component
 ├── App.css                 # App styling
 ├── main.jsx                # React entry point
@@ -113,7 +132,7 @@ src/
 
 ### Testing Events
 
-In development mode, all analytics events are logged to the browser console for easy debugging and validation.
+In development mode, all analytics events are logged to the browser console for easy debugging and validation. Ad blockers may prevent Meta Pixel script loading, but events are still tracked locally.
 
 ## License
 
