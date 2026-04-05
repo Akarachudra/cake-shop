@@ -5,18 +5,21 @@
 
 const isDev = import.meta.env.DEV
 
+// GA4 → Meta Pixel event name mapping
+const META_EVENT_MAP = {
+  view_item: 'ViewContent',
+  add_to_cart: 'AddToCart',
+  remove_from_cart: null,
+  begin_checkout: 'InitiateCheckout',
+  purchase: 'Purchase',
+}
+
 export const analytics = {
-  /**
-   * Initialize GA4 and Meta Pixel
-   * @param {string} ga4MeasurementId - Google Analytics 4 Measurement ID
-   * @param {string} metaPixelId - Meta Pixel ID
-   */
   init: (ga4MeasurementId, metaPixelId) => {
     if (isDev) {
       console.log('[Analytics] Initializing with GA4:', ga4MeasurementId, 'Meta:', metaPixelId)
     }
 
-    // Initialize GA4
     if (ga4MeasurementId) {
       const script1 = document.createElement('script')
       script1.async = true
@@ -30,7 +33,6 @@ export const analytics = {
       window.gtag = gtag
     }
 
-    // Initialize Meta Pixel
     if (metaPixelId) {
       const script2 = document.createElement('script')
       script2.innerHTML = `
@@ -49,9 +51,6 @@ export const analytics = {
     }
   },
 
-  /**
-   * Track a custom event in GA4
-   */
   trackEvent: (eventName, parameters = {}) => {
     if (isDev) {
       console.log('[GA4 Event]', eventName, parameters)
@@ -61,124 +60,96 @@ export const analytics = {
     }
   },
 
-  /**
-   * Track a view_item event
-   */
-  trackViewItem: (item) => {
-    const event = {
-      event_name: 'view_item',
-      value: item.price,
-      currency: 'USD',
-      items: [
-        {
-          item_id: item.id,
-          item_name: item.name,
-          price: item.price,
-          item_category: item.category,
-        }
-      ]
-    }
+  trackFBEvent: (ga4EventName, metaParams = {}) => {
+    const metaEventName = META_EVENT_MAP[ga4EventName]
+    if (!metaEventName) return
+    if (!window.fbq) return
 
     if (isDev) {
-      console.log('[View Item]', event)
+      console.log('[Meta Pixel Event]', metaEventName, metaParams)
     }
 
-    analytics.trackEvent('view_item', event)
+    window.fbq('track', metaEventName, metaParams)
   },
 
-  /**
-   * Track add_to_cart event
-   */
+  trackViewItem: (item) => {
+    const gaParams = {
+      value: item.price,
+      currency: 'USD',
+      items: [{ item_id: item.id, item_name: item.name, price: item.price, item_category: item.category }]
+    }
+    analytics.trackEvent('view_item', gaParams)
+
+    analytics.trackFBEvent('view_item', {
+      content_ids: [item.id],
+      content_name: item.name,
+      content_type: 'product',
+      content_category: item.category,
+      value: item.price,
+      currency: 'USD',
+    })
+  },
+
   trackAddToCart: (item, quantity = 1) => {
-    const event = {
+    const gaParams = {
       value: item.price * quantity,
       currency: 'USD',
-      items: [
-        {
-          item_id: item.id,
-          item_name: item.name,
-          price: item.price,
-          quantity: quantity,
-          item_category: item.category,
-        }
-      ]
+      items: [{ item_id: item.id, item_name: item.name, price: item.price, quantity, item_category: item.category }]
     }
+    analytics.trackEvent('add_to_cart', gaParams)
 
-    if (isDev) {
-      console.log('[Add To Cart]', event)
-    }
-
-    analytics.trackEvent('add_to_cart', event)
+    analytics.trackFBEvent('add_to_cart', {
+      content_ids: [item.id],
+      content_name: item.name,
+      content_type: 'product',
+      value: item.price * quantity,
+      currency: 'USD',
+      num_items: quantity,
+    })
   },
 
-  /**
-   * Track remove_from_cart event
-   */
   trackRemoveFromCart: (item) => {
-    const event = {
+    const gaParams = {
       value: item.price,
       currency: 'USD',
-      items: [
-        {
-          item_id: item.id,
-          item_name: item.name,
-          price: item.price,
-          item_category: item.category,
-        }
-      ]
+      items: [{ item_id: item.id, item_name: item.name, price: item.price, item_category: item.category }]
     }
-
-    if (isDev) {
-      console.log('[Remove From Cart]', event)
-    }
-
-    analytics.trackEvent('remove_from_cart', event)
+    analytics.trackEvent('remove_from_cart', gaParams)
   },
 
-  /**
-   * Track begin_checkout event
-   */
   trackBeginCheckout: (items) => {
     const totalValue = items.reduce((sum, item) => sum + item.price, 0)
-    const event = {
+    const gaParams = {
       value: totalValue,
       currency: 'USD',
-      items: items.map(item => ({
-        item_id: item.id,
-        item_name: item.name,
-        price: item.price,
-        item_category: item.category,
-      }))
+      items: items.map(item => ({ item_id: item.id, item_name: item.name, price: item.price, item_category: item.category }))
     }
+    analytics.trackEvent('begin_checkout', gaParams)
 
-    if (isDev) {
-      console.log('[Begin Checkout]', event)
-    }
-
-    analytics.trackEvent('begin_checkout', event)
+    analytics.trackFBEvent('begin_checkout', {
+      content_ids: items.map(i => i.id),
+      num_items: items.length,
+      value: totalValue,
+      currency: 'USD',
+    })
   },
 
-  /**
-   * Track purchase event
-   */
   trackPurchase: (items, transactionId) => {
     const totalValue = items.reduce((sum, item) => sum + item.price, 0)
-    const event = {
+    const gaParams = {
       transaction_id: transactionId,
       value: totalValue,
       currency: 'USD',
-      items: items.map(item => ({
-        item_id: item.id,
-        item_name: item.name,
-        price: item.price,
-        item_category: item.category,
-      }))
+      items: items.map(item => ({ item_id: item.id, item_name: item.name, price: item.price, item_category: item.category }))
     }
+    analytics.trackEvent('purchase', gaParams)
 
-    if (isDev) {
-      console.log('[Purchase]', event)
-    }
-
-    analytics.trackEvent('purchase', event)
-  }
+    analytics.trackFBEvent('purchase', {
+      content_ids: items.map(i => i.id),
+      content_type: 'product',
+      num_items: items.length,
+      value: totalValue,
+      currency: 'USD',
+    })
+  },
 }
