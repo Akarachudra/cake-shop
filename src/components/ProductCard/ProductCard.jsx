@@ -11,6 +11,7 @@ export default function ProductCard({ product, onView, onAddToCart }) {
         <button
           className="add-to-cart-btn"
           onClick={(e) => {
+            e.preventDefault()
             e.stopPropagation()
             onAddToCart()
           }}
