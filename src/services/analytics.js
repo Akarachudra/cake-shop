@@ -82,7 +82,7 @@ export const analytics = {
 
     analytics.trackFBEvent('view_item', {
       content_ids: [item.id],
-      content_name: item.name,
+      content_names: [item.name],
       content_type: 'product',
       content_category: item.category,
       value: item.price,
@@ -100,7 +100,7 @@ export const analytics = {
 
     analytics.trackFBEvent('add_to_cart', {
       content_ids: [item.id],
-      content_name: item.name,
+      content_names: [item.name],
       content_type: 'product',
       value: item.price * quantity,
       currency: 'USD',
@@ -128,6 +128,8 @@ export const analytics = {
 
     analytics.trackFBEvent('begin_checkout', {
       content_ids: items.map(i => i.id),
+      content_names: items.map(i => i.name),
+      content_type: 'product',
       num_items: items.length,
       value: totalValue,
       currency: 'USD',
@@ -146,10 +148,12 @@ export const analytics = {
 
     analytics.trackFBEvent('purchase', {
       content_ids: items.map(i => i.id),
+      content_names: items.map(i => i.name),
       content_type: 'product',
       num_items: items.length,
       value: totalValue,
       currency: 'USD',
+      event_id: transactionId,
     })
   },
 }
