@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import ProductCatalog from './components/ProductCatalog/ProductCatalog'
 import ProductDetail from './components/ProductDetail/ProductDetail'
 import Cart from './components/Cart/Cart'
@@ -8,7 +8,6 @@ import './App.css'
 
 function AppContent() {
   const [cartItems, setCartItems] = useState([])
-  const location = useLocation()
 
   useEffect(() => {
     analytics.init('G-4C0NWC3REY', '4038437582960474')
@@ -52,9 +51,9 @@ function AppContent() {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/cake-shop/">
+    <HashRouter>
       <AppContent />
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 
