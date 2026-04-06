@@ -7,7 +7,7 @@ export default function Cart({ items }) {
   const [showCheckout, setShowCheckout] = useState(false)
   const [transactionId, setTransactionId] = useState(null)
 
-  const total = items.reduce((sum, item) => sum + item.price, 0)
+  const total = items.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0)
 
   const handleCheckout = () => {
     if (items.length === 0) return
@@ -23,9 +23,11 @@ export default function Cart({ items }) {
     setShowCheckout(false)
   }
 
-  const handleRemoveItem = (indexToRemove) => {
-    const item = items[indexToRemove]
-    analytics.trackRemoveFromCart(item)
+  const handleRemoveItem = (itemId) => {
+    const item = items.find(i => i.id === itemId)
+    if (item) {
+      analytics.trackRemoveFromCart(item)
+    }
   }
 
   if (transactionId) {
@@ -48,10 +50,10 @@ export default function Cart({ items }) {
       ) : (
         <>
           <div className="cart-items">
-            {items.map((item, index) => (
-              <div key={index} className="cart-item">
-                <span>{item.image} {item.name}</span>
-                <span>${item.price}</span>
+            {items.map((item) => (
+              <div key={item.id} className="cart-item">
+                <span>{item.image} {item.name} × {item.quantity || 1}</span>
+                <span>${item.price * (item.quantity || 1)}</span>
               </div>
             ))}
           </div>

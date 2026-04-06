@@ -81,10 +81,8 @@ export const analytics = {
     analytics.trackEvent('view_item', gaParams)
 
     analytics.trackFBEvent('view_item', {
-      content_ids: [item.id],
-      content_names: [item.name],
+      content_name: item.name,
       content_type: 'product',
-      content_category: item.category,
       value: item.price,
       currency: 'USD',
     })
@@ -100,7 +98,7 @@ export const analytics = {
 
     analytics.trackFBEvent('add_to_cart', {
       content_ids: [item.id],
-      content_names: [item.name],
+      content_name: item.name,
       content_type: 'product',
       value: item.price * quantity,
       currency: 'USD',
@@ -118,39 +116,39 @@ export const analytics = {
   },
 
   trackBeginCheckout: (items) => {
-    const totalValue = items.reduce((sum, item) => sum + item.price, 0)
+    const totalValue = items.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0)
+    const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0)
     const gaParams = {
       value: totalValue,
       currency: 'USD',
-      items: items.map(item => ({ item_id: item.id, item_name: item.name, price: item.price, item_category: item.category }))
+      items: items.map(item => ({ item_id: item.id, item_name: item.name, price: item.price, quantity: item.quantity || 1, item_category: item.category }))
     }
     analytics.trackEvent('begin_checkout', gaParams)
 
     analytics.trackFBEvent('begin_checkout', {
-      content_ids: items.map(i => i.id),
-      content_names: items.map(i => i.name),
+      contents: items.map(i => ({ id: i.id, quantity: i.quantity || 1 })),
       content_type: 'product',
-      num_items: items.length,
+      num_items: totalItems,
       value: totalValue,
       currency: 'USD',
     })
   },
 
   trackPurchase: (items, transactionId) => {
-    const totalValue = items.reduce((sum, item) => sum + item.price, 0)
+    const totalValue = items.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0)
+    const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0)
     const gaParams = {
       transaction_id: transactionId,
       value: totalValue,
       currency: 'USD',
-      items: items.map(item => ({ item_id: item.id, item_name: item.name, price: item.price, item_category: item.category }))
+      items: items.map(item => ({ item_id: item.id, item_name: item.name, price: item.price, quantity: item.quantity || 1, item_category: item.category }))
     }
     analytics.trackEvent('purchase', gaParams)
 
     analytics.trackFBEvent('purchase', {
-      content_ids: items.map(i => i.id),
-      content_names: items.map(i => i.name),
+      contents: items.map(i => ({ id: i.id, quantity: i.quantity || 1 })),
       content_type: 'product',
-      num_items: items.length,
+      num_items: totalItems,
       value: totalValue,
       currency: 'USD',
       event_id: transactionId,
