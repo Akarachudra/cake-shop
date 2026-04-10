@@ -6,7 +6,7 @@ import './ProductDetail.css'
 
 export default function ProductDetail({ onAddToCart }) {
   const { id } = useParams()
-  const product = PRODUCTS.find(p => p.id === parseInt(id))
+  const product = PRODUCTS.find(p => p.id === id)
 
   useEffect(() => {
     if (product) {
@@ -63,7 +63,7 @@ export default function ProductDetail({ onAddToCart }) {
 
           <div className="product-url">
             <p className="url-label">Share this product:</p>
-            <code className="url-code">{window.location.origin}/cake-shop/product/{product.id}</code>
+            <code className="url-code">{window.location.origin}{window.location.pathname}#/product/{product.id}</code>
           </div>
         </div>
       </div>
