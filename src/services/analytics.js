@@ -60,7 +60,7 @@ export const analytics = {
     }
   },
 
-  trackFBEvent: (ga4EventName, metaParams = {}) => {
+  trackFBEvent: (ga4EventName, metaParams = {}, eventId = null) => {
     const metaEventName = META_EVENT_MAP[ga4EventName]
     if (!metaEventName) return
     if (!window.fbq) return
@@ -69,7 +69,11 @@ export const analytics = {
       console.log('[Meta Pixel Event]', metaEventName, metaParams)
     }
 
-    window.fbq('track', metaEventName, metaParams)
+    if (eventId) {
+      window.fbq('track', metaEventName, metaParams, eventId)
+    } else {
+      window.fbq('track', metaEventName, metaParams)
+    }
   },
 
   trackViewItem: (item) => {
@@ -154,7 +158,6 @@ export const analytics = {
       num_items: totalItems,
       value: totalValue,
       currency: 'USD',
-      event_id: transactionId,
-    })
+    }, transactionId)
   },
 }
