@@ -3,7 +3,7 @@ import { analytics } from '../../services/analytics'
 import OrderSuccess from '../OrderSuccess/OrderSuccess'
 import './Cart.css'
 
-export default function Cart({ items }) {
+export default function Cart({ items, onRemoveItem }) {
   const [showCheckout, setShowCheckout] = useState(false)
   const [transactionId, setTransactionId] = useState(null)
 
@@ -27,6 +27,7 @@ export default function Cart({ items }) {
     const item = items.find(i => i.id === itemId)
     if (item) {
       analytics.trackRemoveFromCart(item)
+      onRemoveItem(itemId)
     }
   }
 
@@ -52,8 +53,16 @@ export default function Cart({ items }) {
           <div className="cart-items">
             {items.map((item) => (
               <div key={item.id} className="cart-item">
-                <span>{item.image} {item.name} × {item.quantity || 1}</span>
-                <span>${item.price * (item.quantity || 1)}</span>
+                <div className="item-details">
+                  <span>{item.image} {item.name} × {item.quantity || 1}</span>
+                  <span>${item.price * (item.quantity || 1)}</span>
+                </div>
+                <button
+                  className="remove-btn"
+                  onClick={() => handleRemoveItem(item.id)}
+                >
+                  Remove
+                </button>
               </div>
             ))}
           </div>

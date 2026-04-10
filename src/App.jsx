@@ -27,6 +27,12 @@ function AppContent() {
     })
   }
 
+  const handleRemoveFromCart = (productId) => {
+    setCartItems(prevItems =>
+      prevItems.filter(item => item.id !== productId)
+    )
+  }
+
   return (
     <div className="app">
       <header className="header">
@@ -41,9 +47,9 @@ function AppContent() {
             element={
               <>
                 <ProductCatalog onAddToCart={handleAddToCart} />
-                <Cart items={cartItems} />
+                <Cart items={cartItems} onRemoveItem={handleRemoveFromCart} />
               </>
-            }
+}
           />
           <Route
             path="/product/:id"
