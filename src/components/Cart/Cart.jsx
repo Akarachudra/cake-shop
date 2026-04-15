@@ -3,7 +3,7 @@ import { analytics } from '../../services/analytics'
 import OrderSuccess from '../OrderSuccess/OrderSuccess'
 import './Cart.css'
 
-export default function Cart({ items, onRemoveItem }) {
+export default function Cart({ items, onRemoveItem, onPurchaseComplete }) {
   const [showCheckout, setShowCheckout] = useState(false)
   const [transactionId, setTransactionId] = useState(null)
 
@@ -21,6 +21,7 @@ export default function Cart({ items, onRemoveItem }) {
     analytics.trackPurchase(items, txnId)
     setTransactionId(txnId)
     setShowCheckout(false)
+    onPurchaseComplete()
   }
 
   const handleRemoveItem = (itemId) => {
@@ -36,7 +37,10 @@ export default function Cart({ items, onRemoveItem }) {
       <section className="cart">
         <OrderSuccess
           transactionId={transactionId}
-          onContinueShopping={() => setTransactionId(null)}
+          onContinueShopping={() => {
+            setTransactionId(null)
+            setShowCheckout(false)
+          }}
         />
       </section>
     )

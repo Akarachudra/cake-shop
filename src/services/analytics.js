@@ -112,10 +112,11 @@ export const analytics = {
   },
 
   trackRemoveFromCart: (item) => {
+    const quantity = item.quantity || 1
     const gaParams = {
-      value: item.price,
+      value: item.price * quantity,
       currency: 'USD',
-      items: [{ item_id: item.id, item_name: item.name, price: item.price, item_category: item.category }]
+      items: [{ item_id: item.id, item_name: item.name, price: item.price, quantity, item_category: item.category }]
     }
     analytics.trackEvent('remove_from_cart', gaParams)
   },

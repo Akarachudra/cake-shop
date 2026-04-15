@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import ProductCard from '../ProductCard/ProductCard'
 import { analytics } from '../../services/analytics'
 import './ProductCatalog.css'
@@ -13,17 +12,6 @@ export const PRODUCTS = [
 ]
 
 export default function ProductCatalog({ onAddToCart }) {
-  useEffect(() => {
-    // Track page view when catalog loads
-    analytics.trackEvent('page_view', {
-      page_title: 'Product Catalog',
-    })
-  }, [])
-
-  const handleProductClick = (product) => {
-    analytics.trackViewItem(product)
-  }
-
   const handleAddToCart = (product) => {
     analytics.trackAddToCart(product)
     onAddToCart(product)
@@ -37,7 +25,6 @@ export default function ProductCatalog({ onAddToCart }) {
           <ProductCard
             key={product.id}
             product={product}
-            onView={() => handleProductClick(product)}
             onAddToCart={() => handleAddToCart(product)}
           />
         ))}

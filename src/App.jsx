@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { HashRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
 import ProductCatalog from './components/ProductCatalog/ProductCatalog'
 import ProductDetail from './components/ProductDetail/ProductDetail'
 import Cart from './components/Cart/Cart'
@@ -8,10 +8,19 @@ import './App.css'
 
 function AppContent() {
   const [cartItems, setCartItems] = useState([])
+  const location = useLocation()
 
   useEffect(() => {
     analytics.init('G-4C0NWC3REY', '4038437582960474')
   }, [])
+
+  useEffect(() => {
+    analytics.trackEvent('page_view', {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: `${location.pathname}${location.search}`,
+    })
+  }, [location.pathname, location.search])
 
   const handleAddToCart = (product) => {
     setCartItems(prevItems => {
@@ -33,6 +42,10 @@ function AppContent() {
     )
   }
 
+  const handlePurchaseComplete = () => {
+    setCartItems([])
+  }
+
   return (
     <div className="app">
       <header className="header">
@@ -47,7 +60,11 @@ function AppContent() {
             element={
               <>
                 <ProductCatalog onAddToCart={handleAddToCart} />
-                <Cart items={cartItems} onRemoveItem={handleRemoveFromCart} />
+                <Cart
+                  items={cartItems}
+                  onRemoveItem={handleRemoveFromCart}
+                  onPurchaseComplete={handlePurchaseComplete}
+                />
               </>
 }
           />
@@ -72,4 +89,3 @@ export default function App() {
     </HashRouter>
   )
 }
-
