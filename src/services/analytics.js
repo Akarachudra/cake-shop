@@ -43,7 +43,7 @@ export const analytics = {
           n.queue=[];t=b.createElement(e);t.async=!0;
           t.src=v;s=b.getElementsByTagName(e)[0];
           s.parentNode.insertBefore(t,s)}(window, document,'script',
-          'https://connect.facebook.net/en_US/fbevents.js');
+          'https://connect.facebook.net/en_US/fbevents.js?v=next');
         fbq('init', '${metaPixelId}');
         fbq('track', 'PageView');
       `
