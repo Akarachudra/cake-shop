@@ -44,6 +44,7 @@ export const analytics = {
           t.src=v;s=b.getElementsByTagName(e)[0];
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js?v=next');
+        fbq('consent', 'grant');
         fbq('init', '${metaPixelId}');
         fbq('track', 'PageView');
       `
@@ -69,8 +70,10 @@ export const analytics = {
       console.log('[Meta Pixel Event]', metaEventName, metaParams)
     }
 
+    window.fbq('consent', 'grant')
+
     if (eventId) {
-      window.fbq('track', metaEventName, metaParams, eventId)
+      window.fbq('track', metaEventName, metaParams, { eventID: eventId })
     } else {
       window.fbq('track', metaEventName, metaParams)
     }
