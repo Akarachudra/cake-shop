@@ -14,6 +14,32 @@ const META_EVENT_MAP = {
   purchase: 'Purchase',
 }
 
+const pendingMetaEvents = []
+
+const sendFBEvent = (metaEventName, metaParams, eventId = null) => {
+  if (!window.fbq) {
+    pendingMetaEvents.push({ metaEventName, metaParams, eventId })
+    return
+  }
+
+  window.fbq('consent', 'grant')
+
+  if (eventId) {
+    window.fbq('track', metaEventName, metaParams, { eventID: eventId })
+  } else {
+    window.fbq('track', metaEventName, metaParams)
+  }
+}
+
+const flushPendingMetaEvents = () => {
+  if (!window.fbq || pendingMetaEvents.length === 0) return
+
+  const events = pendingMetaEvents.splice(0)
+  events.forEach(({ metaEventName, metaParams, eventId }) => {
+    sendFBEvent(metaEventName, metaParams, eventId)
+  })
+}
+
 export const analytics = {
   init: (ga4MeasurementId, metaPixelId) => {
     if (isDev) {
@@ -49,6 +75,7 @@ export const analytics = {
         fbq('track', 'PageView');
       `
       document.head.appendChild(script2)
+      flushPendingMetaEvents()
     }
   },
 
@@ -64,19 +91,11 @@ export const analytics = {
   trackFBEvent: (ga4EventName, metaParams = {}, eventId = null) => {
     const metaEventName = META_EVENT_MAP[ga4EventName]
     if (!metaEventName) return
-    if (!window.fbq) return
-
     if (isDev) {
       console.log('[Meta Pixel Event]', metaEventName, metaParams)
     }
 
-    window.fbq('consent', 'grant')
-
-    if (eventId) {
-      window.fbq('track', metaEventName, metaParams, { eventID: eventId })
-    } else {
-      window.fbq('track', metaEventName, metaParams)
-    }
+    sendFBEvent(metaEventName, metaParams, eventId)
   },
 
   trackViewItem: (item) => {
